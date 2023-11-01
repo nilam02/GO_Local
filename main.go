@@ -8,8 +8,11 @@ import (
 	"example.com/sankey-golang-common-lib/components" // Import the created datetime package
 	"example.com/sankey-golang-common-lib/config"
 	"example.com/sankey-golang-common-lib/validations"
+	"example.com/sankey-golang-common-lib/http"
 	"log"
 	"os"
+	// "io/ioutil"
+	// "net/http"
 )
 
 func main() {
@@ -125,12 +128,71 @@ func main() {
 	}
 
 	// Testing URL validation
-	url := "https://example.com"
+	url := "https://examplecom"
 	err = validations.ValidateURL(url)
 	if err != nil {
 		fmt.Println("URL validation error:", err)
 	} else {
 		fmt.Println("URL is valid")
+	}
+
+
+	// Testing get api 
+	url1 := "https://api.openweathermap.org/data/2.5/weather?lat=44.34&lon=10.99&appid=747810ce9291121b47d6c93660d58490"
+	resp, err := http.MakeRequest(url1, "GET", nil, nil)
+	fmt.Println(valid)
+	if err != nil {
+		fmt.Println("Error making request:", err)
+		return
+	}
+	fmt.Println("Response:", string(resp))
+
+
+	// testing post api
+	url2 := "https://jsonplaceholder.typicode.com/posts"
+	body := []byte(`{
+		"title": "foo",
+		"body": "bar",
+		"userId": 1
+	}`)
+	response, err := http.MakeRequest(url2, "POST", nil, body)
+	if err != nil {
+		fmt.Println("Error making request:", err)
+		return
+	}
+
+	fmt.Println("Response:", string(response))
+
+
+
+
+	//Testing encryption and decryption
+
+	key := []byte("examplekey123456") // Define your key here or in env file
+
+	// Test encryption
+	plaintext := []byte("Hello, World!") // Define the plaintext here
+	ciphertext, err := components.Encrypt(key, plaintext)
+	if err != nil {
+		fmt.Println("Error during encryption:", err)
+	} else {
+		fmt.Println("Ciphertext:", ciphertext)
+	}
+
+	// Test decryption
+	decryptedText, err := components.Decrypt(key, ciphertext)
+	if err != nil {
+		fmt.Println("Error during decryption:", err)
+	} else {
+		fmt.Println("Decrypted text:", string(decryptedText))
+	}
+
+
+	//testing error handler
+	err := errors.New("example error")
+	if handleError := components.HandleError(err, "An error occurred:"); handleError != nil {
+		// Handle the error
+		fmt.Println("handleError", handleError)
 	}
 
 
